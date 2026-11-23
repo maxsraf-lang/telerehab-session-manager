@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.unisa.telerehab.ui.HelloController"
+      spacing="16" alignment="CENTER">
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
+
+    <Label text="Telerehab Session Manager" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <Label text="Pre-Game check: CARDIAC_REHAB patient, intensity 6, seed 42"/>
+    <Label fx:id="sampleLabel" style="-fx-font-family: monospace;" wrapText="true"/>
+
+    <HBox spacing="12" alignment="CENTER">
+        <Button text="Step (+1 s)" onAction="#onStep" defaultButton="true"/>
+        <Button text="Reset" onAction="#onReset"/>
+    </HBox>
+</VBox>

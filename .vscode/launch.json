@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Run Telerehab Session Manager",
+      "request": "launch",
+      "mainClass": "it.unisa.telerehab.app.Launcher",
+      "projectName": "telerehab-session-manager"
+    }
+  ]
+}
