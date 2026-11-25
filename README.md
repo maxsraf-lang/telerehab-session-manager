@@ -12,10 +12,10 @@ real-time safety monitoring and clinical filtering.
 
 | Member | Area |
 | --- | --- |
-| Raffaele | A. Telemetry & Safety |
-| Carmen | B. Exercise Catalog & Clinical Filtering |
-| Filippo | C. Protocol Editing & History |
-| Christian | D. Session Execution & Monitor |
+| Raffaele Esposito| A. Telemetry & Safety |
+| Carmen Campitelli| B. Exercise Catalog & Clinical Filtering |
+| Filippo Cioffi| C. Protocol Editing & History |
+| Christian Giangiacomi| D. Session Execution & Monitor |
 
 ## Requirements
 

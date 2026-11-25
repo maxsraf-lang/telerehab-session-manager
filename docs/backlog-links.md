@@ -1,12 +1,11 @@
 # Backlogs and task board
 
-The product backlog, the sprint backlogs and the project burndown chart are kept in a
-shared spreadsheet (downloadable as .xlsx), as requested by the assignment.
-Completed items are never deleted, they are moved to the Done status.
-
-| Artifact | Link |
+| Artifact | Where |
 | --- | --- |
-| Product backlog, sprint backlogs, burndown | https://claude.ai/artifact/Mjt6HLiB1zsBVAx2XFyTX7 |
-| Trello Sprint Task Board | TODO: add the Trello board link |
+| Product backlog, Sprint 1 backlog with tasks, summary, decisions | [Telerehab_Product_Backlog.xlsx](Telerehab_Product_Backlog.xlsx) |
+| Sprint Task Board | [Trello board](https://trello.com/b/IHgEjEHt) |
+| Software architecture | [architecture.md](architecture.md) |
+| Pre-Game presentation | [presentations/](presentations/) |
 
-An .xlsx export of the spreadsheet is added to `docs/sprint-N/` at the end of each sprint.
+Completed items are never deleted: they are moved to the Done status.
+At the end of each sprint the updated backlog and the burndown are committed here and in `docs/sprint-N/`.
