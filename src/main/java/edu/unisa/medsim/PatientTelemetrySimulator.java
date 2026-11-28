@@ -108,7 +108,9 @@ public class PatientTelemetrySimulator {
 
         int effectiveIntensity = isResting ? 0 : exerciseIntensity;
 
-        // Profile-specific parameters are provided by the ClinicalProfile strategy        double hrAdaptationRate = profile.getHrAdaptationRate(isResting);
+        // Profile-specific parameters are provided by the ClinicalProfile strategy
+        double targetHr = baselineHr + (effectiveIntensity * profile.getHrGainPerIntensity());        
+        double hrAdaptationRate = profile.getHrAdaptationRate(isResting);
         double targetSpo2 = baselineSpo2 - (effectiveIntensity * profile.getSpo2DropPerIntensity());
         double spo2AdaptationRate = profile.getSpo2AdaptationRate(isResting);
         double fatigueRatePerSec = isResting
