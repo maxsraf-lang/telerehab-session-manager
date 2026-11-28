@@ -36,7 +36,7 @@ launch configuration "Run Telerehab Session Manager" (main class
 ## Project structure
 
 ```
-src/main/java/edu/unisa/medsim/        provided telemetry simulator (refactored in US-07)
+src/main/java/edu/unisa/medsim/        provided telemetry simulator (refactored in US-12)
 src/main/java/it/unisa/telerehab/
     app/          entry points
     ui/           JavaFX controllers (FXML views in src/main/resources)
@@ -59,5 +59,5 @@ docs/             architecture, backlog links, sprint reports, presentations
 
 - `main` contains only released sprint increments, tagged `v0.1-sprint1`, `v0.2-sprint2`, `v1.0-final`
 - daily work goes to `develop` through Pull Requests reviewed by another member
-- one branch per story or task: `feature/US-07-profile-strategy`
-- commit messages start with the story id: `US-07: introduce ClinicalProfile interface`
+- one branch per story or task: `feature/US-12-profile-strategy`
+- commit messages start with the story id: `US-12: introduce ClinicalProfile interface`
