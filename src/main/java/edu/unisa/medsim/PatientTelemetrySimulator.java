@@ -28,7 +28,7 @@ public class PatientTelemetrySimulator {
     private static final double PAIN_FATIGUE_THRESHOLD = 7.5;
     private static final double PAIN_RECOVERY_FATIGUE_THRESHOLD = 5.0;
 
-    private final ClinicalProfileType profileType;
+    private final ClinicalProfile profile;
     private final double baselineHr;
     private final double baselineSpo2;
     private final long seed;
@@ -44,25 +44,24 @@ public class PatientTelemetrySimulator {
     /**
      * Creates a simulator with default clinical baselines for the specified profile.
      *
-     * @param profileType the clinical behavioral profile of the simulated patient
+     * @param profile     the clinical profile of the simulated patient
      * @param seed        random seed for simulation reproducibility
      */
-    public PatientTelemetrySimulator(ClinicalProfileType profileType, long seed) {
-        this(profileType, defaultBaselineHr(profileType), defaultBaselineSpo2(profileType), seed);
-        
+    public PatientTelemetrySimulator(ClinicalProfile profile, long seed) {
+        this(profile, requireProfile(profile).getDefaultBaselineHr(), profile.getDefaultBaselineSpo2(), seed);
     }
 
     /**
      * Creates a simulator with custom resting baseline parameters.
      *
-     * @param profileType  the clinical behavioral profile of the simulated patient
+     * @param profile      the clinical profile of the simulated patient
      * @param baselineHr   resting heart rate in BPM (must be within [40, 220])
      * @param baselineSpo2 resting oxygen saturation percentage (must be within [70, 100])
      * @param seed         random seed for simulation reproducibility
      */
-    public PatientTelemetrySimulator(ClinicalProfileType profileType, double baselineHr,
+    public PatientTelemetrySimulator(ClinicalProfile profile, double baselineHr,
                                      double baselineSpo2, long seed) {
-        this.profileType = Objects.requireNonNull(profileType, "profileType must not be null");
+        this.profile = Objects.requireNonNull(profile, "profile must not be null");
         if (baselineHr < MIN_HR_BPM || baselineHr > MAX_HR_BPM) {
             throw new IllegalArgumentException("baselineHr out of physiological bounds");
         }
@@ -109,58 +108,18 @@ public class PatientTelemetrySimulator {
 
         int effectiveIntensity = isResting ? 0 : exerciseIntensity;
 
-        double targetHr;
-        double hrAdaptationRate;
-        double targetSpo2;
-        double spo2AdaptationRate;
-        double fatigueRatePerSec;
-        double noiseAmplitude;
-
-        
-        switch (profileType) {
-            case ATHLETIC:
-                targetHr = baselineHr + (effectiveIntensity * 8.5);
-                hrAdaptationRate = isResting ? 0.10 : 0.08;
-                targetSpo2 = baselineSpo2 - (effectiveIntensity * 0.05);
-                spo2AdaptationRate = 0.15;
-                fatigueRatePerSec = isResting ? -0.06 : (0.008 * effectiveIntensity);
-                noiseAmplitude = 0.4;
-                break;
-
-            case CARDIAC_REHAB:
-                targetHr = baselineHr + (effectiveIntensity * 11.5);
-                hrAdaptationRate = isResting ? 0.035 : 0.12;
-                targetSpo2 = baselineSpo2 - (effectiveIntensity * 0.18);
-                spo2AdaptationRate = 0.08;
-                fatigueRatePerSec = isResting ? -0.03 : (0.018 * effectiveIntensity);
-                noiseAmplitude = 0.7;
-                break;
-
-            case FRAGILE_ELDERLY:
-                targetHr = baselineHr + (effectiveIntensity * 6.5);
-                hrAdaptationRate = isResting ? 0.03 : 0.05;
-                targetSpo2 = baselineSpo2 - (effectiveIntensity * 0.22);
-                spo2AdaptationRate = 0.06;
-                fatigueRatePerSec = isResting ? -0.025 : (0.024 * effectiveIntensity);
-                noiseAmplitude = 0.6;
-                break;
-
-            case PULMONARY_COPD:
-                targetHr = baselineHr + (effectiveIntensity * 9.5);
-                hrAdaptationRate = isResting ? 0.045 : 0.09;
-                targetSpo2 = baselineSpo2 - (effectiveIntensity * 0.75);
-                spo2AdaptationRate = isResting ? 0.04 : 0.07;
-                fatigueRatePerSec = isResting ? -0.03 : (0.020 * effectiveIntensity);
-                noiseAmplitude = 0.8;
-                break;
-
-            default:
-                throw new IllegalStateException("Unsupported clinical profile: " + profileType);
-        }
+        // Profile-specific parameters come from the strategy: no switch on the profile type
+        double targetHr = baselineHr + (effectiveIntensity * profile.getHrGainPerIntensity());
+        double hrAdaptationRate = profile.getHrAdaptationRate(isResting);
+        double targetSpo2 = baselineSpo2 - (effectiveIntensity * profile.getSpo2DropPerIntensity());
+        double spo2AdaptationRate = profile.getSpo2AdaptationRate(isResting);
+        double fatigueRatePerSec = isResting
+                ? profile.getRestingFatigueRate()
+                : (profile.getFatigueRatePerIntensity() * effectiveIntensity);
+        double noiseAmplitude = profile.getNoiseAmplitude();
 
         // If the session random draw exceeded 0.85, perturb expected targets and Gaussian dispersion
         if (perturbedSession) {
-            
             targetHr += random.nextDouble(10, 21);
             targetSpo2 -= random.nextDouble(2, 8);
             fatigueRatePerSec += random.nextDouble(0.1, 0.2);
@@ -201,29 +160,16 @@ public class PatientTelemetrySimulator {
         return new TelemetrySample(elapsedSeconds, currentHr, currentSpo2, currentFatigue, currentPain);
     }
 
-    public ClinicalProfileType getProfileType() {
-        return profileType;
+    /**
+     * @return the clinical profile of the simulated patient
+     */
+    public ClinicalProfile getProfile() {
+        return profile;
     }
 
-    private static double defaultBaselineHr(ClinicalProfileType type) {
-        Objects.requireNonNull(type, "profileType must not be null");
-        switch (type) {
-            case ATHLETIC:
-                return 58.0;
-            case CARDIAC_REHAB:
-                return 72.0;
-            case FRAGILE_ELDERLY:
-                return 68.0;
-            case PULMONARY_COPD:
-                return 78.0;
-            default:
-                return 70.0;
-        }
-    }
-
-    private static double defaultBaselineSpo2(ClinicalProfileType type) {
-        Objects.requireNonNull(type, "profileType must not be null");
-        return (type == ClinicalProfileType.PULMONARY_COPD) ? 95.0 : 98.5;
+    /** Null check usable inside {@code this(...)}, before the profile is dereferenced. */
+    private static ClinicalProfile requireProfile(ClinicalProfile profile) {
+        return Objects.requireNonNull(profile, "profile must not be null");
     }
 
     private static double clamp(double value, double min, double max) {
